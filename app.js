@@ -51,6 +51,6 @@ passport.deserializeUser((id, done) => {
 
 app.use('/', routes);
 
-app.listen(process.env.PORT || 4444, () => {
-  console.log(`Server is running at `);
+app.listen(process.env.PORT, () => {
+  console.log();
 });
