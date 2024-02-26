@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -51,6 +52,6 @@ passport.deserializeUser((id, done) => {
 
 app.use('/', routes);
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 4444, () => {
   console.log();
 });
