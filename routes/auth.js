@@ -5,47 +5,43 @@ const User = require('../models/user')(sequelize);
 
 const router = express.Router();
 
-router.post('/login', 
-  (req, res, next) => {
-    const { username, password } = req.body;
+router.post('/login', (req, res, next) => {
+  const { username, password } = req.body;
 
-    User.findOne({
-      where: {
-        username: username,
-      },
-    })
-      .then(user => {
-        if (!user) {
-          return res.status(401).json({ error: 'Authentication failed. User not found.' });
-        }
-
-        if (user.status === 'blocked') {
-          return res.status(403).json({ error: 'Authentication failed. User is blocked.' });
-        }
-        
-        passport.authenticate('local', { failureRedirect: '/login' })(req, res, next);
-      })
-      .catch(err => {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
-      });
-  },
-  (req, res) => {
-    const userId = req.user.id;
-
-    User.update(
-      { lastLoginDate: new Date() },
-      { where: { id: userId } }
-    )
+  User.findOne({
+    where: {
+      username: username,
+    },
+  })
     .then(user => {
-      res.json({user})
+      if (!user) {
+        return res.status(401).json({ error: 'Authentication failed. User not found.' });
+      }
+
+      if (user.status === 'blocked') {
+        return res.status(403).json({ error: 'Authentication failed. User is blocked.' });
+      }
+
+      passport.authenticate('local', { failureRedirect: '/login' })(req, res, next);
+
+      User.update(
+        { lastLoginDate: new Date() },
+        { where: { id: user.id } }
+      )
+        .then(updatedUser => {
+          res.json({ user: updatedUser });
+        })
+        .catch(err => {
+          console.error(err);
+          res.status(500).json({ error: 'Internal Server Error' });
+        });
     })
-      .catch(err => {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
-      });
-  }
-);
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    });
+});
+
 
 
 
