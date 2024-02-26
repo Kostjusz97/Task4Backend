@@ -13,7 +13,7 @@ const app = express();
 
 const UserModel = User(sequelize);
 
-sequelize.sync().then(() => {
+sequelize.sync({ force: true }).then(() => {
   console.log('Database and tables created!');
 });
 
